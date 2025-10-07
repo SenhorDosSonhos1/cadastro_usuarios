@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 # Create your views here.
 
-def cadastro(request):
+def usuario_cadastro(request):
     if request.method == "POST":
         nome_usuario = request.POST.get("username")
         email = request.POST.get("email")
@@ -23,8 +24,21 @@ def cadastro(request):
         return redirect(reverse('login'))
     return render(request, 'cadastro.html')
 
-def login(request):
-    return HttpResponse('login')
+def usuario_login(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        senha = request.POST.get("password")
 
-def logout(request):
-    return HttpResponse('logout')
+        usuario = authenticate(email = email, password = senha)
+
+        if usuario is not None:
+            login(request, usuario)
+            return HttpResponse("Logado")
+            login(request, usuario)
+        return HttpResponse("Não existe um usuario com essas credenciais")
+            
+    return render(request, 'login.html')
+
+def usuario_logout(request):
+    logout(request)
+    return redirect(reverse('login'))
