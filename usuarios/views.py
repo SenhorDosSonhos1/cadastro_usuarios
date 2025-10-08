@@ -20,15 +20,16 @@ def usuario_cadastro(request):
             return redirect(reverse('cadastro'))
         
         if User.objects.filter(username = nome_usuario, email = email).exists():
-            return HttpResponse("Usuario ja existe")
+            messages.warning(request, "Nome de usuário já está em uso.")
         
         user = User.objects.create_user(
             username = nome_usuario,
             email = email,
             password = senha
         )
-
+        messages.success(request, "Conta criada com sucesso! Faça login.")
         return redirect(reverse('login'))
+    
     return render(request, 'cadastro.html')
 
 def usuario_login(request):
@@ -40,11 +41,16 @@ def usuario_login(request):
 
         if usuario is not None:
             login(request, usuario)
-            return HttpResponse("Logado")
-        return HttpResponse("Não existe um usuario com essas credenciais")
+            messages.success(request, f"Bem-vindo(a), {nome_usuario}!")
+            return redirect(reverse('home'))
+        
+        messages.error(request,'Não existe um usuario com essas credenciais')
+        return redirect(reverse('login'))
+
             
     return render(request, 'login.html')
 
 def usuario_logout(request):
     logout(request)
+    messages.info(request, "Você saiu da sua conta.")
     return redirect(reverse('login'))
